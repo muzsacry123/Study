@@ -53,6 +53,14 @@ jobs:
       - name: Perform CodeQL Analysis
         if: contains(github.workspace, '*.py')
         uses: github/codeql-action/analyze@v4
+        with:
+          output: results.sarif
+
+      - name: Upload SARIF file
+        if: contains(github.workspace, '*.py')
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: results.sarif
 
   java:
     name: Java/Kotlin CodeQL
@@ -96,6 +104,14 @@ jobs:
       - name: Perform CodeQL Analysis
         if: contains(github.workspace, '*.java')
         uses: github/codeql-action/analyze@v4
+        with:
+          output: results.sarif
+
+      - name: Upload SARIF file
+        if: contains(github.workspace, '*.java')
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: results.sarif
 
   cpp:
     name: C/C++ CodeQL
@@ -142,6 +158,14 @@ jobs:
       - name: Perform CodeQL Analysis
         if: contains(github.workspace, '*.c') || contains(github.workspace, '*.cpp')
         uses: github/codeql-action/analyze@v4
+        with:
+          output: results.sarif
+
+      - name: Upload SARIF file
+        if: contains(github.workspace, '*.c') || contains(github.workspace, '*.cpp')
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: results.sarif
 
   csharp:
     name: C# CodeQL
@@ -189,6 +213,14 @@ jobs:
       - name: Perform CodeQL Analysis
         if: contains(github.workspace, '*.csproj') || contains(github.workspace, '*.cs')
         uses: github/codeql-action/analyze@v4
+        with:
+          output: results.sarif
+
+      - name: Upload SARIF file
+        if: contains(github.workspace, '*.csproj') || contains(github.workspace, '*.cs')
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: results.sarif
 
   javascript:
     name: JavaScript/TypeScript CodeQL
@@ -235,3 +267,11 @@ jobs:
       - name: Perform CodeQL Analysis
         if: contains(github.workspace, '*.js') || contains(github.workspace, '*.ts')
         uses: github/codeql-action/analyze@v4
+        with:
+          output: results.sarif
+
+      - name: Upload SARIF file
+        if: contains(github.workspace, '*.js') || contains(github.workspace, '*.ts')
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: results.sarif
