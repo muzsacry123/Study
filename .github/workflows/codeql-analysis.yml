@@ -157,18 +157,24 @@ jobs:
             echo "csharp_present=false" >> $GITHUB_ENV
           fi
 
+      - name: Skip if no C# code
+        if: env.csharp_present == 'false'
+        run: |
+          echo "No C# code found, skipping CodeQL analysis"
+          exit 0
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
           languages: csharp
 
-      - name: Build C#
+      - name: Build C# projects
         run: |
-          if ls *.csproj 1> /dev/null 2>&1; then
-            dotnet build
-          else
-            echo "No C# project files found, skipping build"
-          fi
+          shopt -s globstar
+          for proj in **/*.csproj; do
+            echo "Building $proj"
+            dotnet build "$proj"
+          done
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
