@@ -53,8 +53,6 @@ jobs:
       - name: Perform CodeQL Analysis
         if: contains(github.workspace, '*.py')
         uses: github/codeql-action/analyze@v4
-        with:
-          upload: false 
 
   java:
     name: Java/Kotlin CodeQL
@@ -98,8 +96,6 @@ jobs:
       - name: Perform CodeQL Analysis
         if: contains(github.workspace, '*.java')
         uses: github/codeql-action/analyze@v4
-        with:
-          upload: false 
 
   cpp:
     name: C/C++ CodeQL
@@ -146,8 +142,6 @@ jobs:
       - name: Perform CodeQL Analysis
         if: contains(github.workspace, '*.c') || contains(github.workspace, '*.cpp')
         uses: github/codeql-action/analyze@v4
-        with:
-          upload: false 
 
   csharp:
     name: C# CodeQL
@@ -195,8 +189,6 @@ jobs:
       - name: Perform CodeQL Analysis
         if: contains(github.workspace, '*.csproj') || contains(github.workspace, '*.cs')
         uses: github/codeql-action/analyze@v4
-        with:
-          upload: false 
 
   javascript:
     name: JavaScript/TypeScript CodeQL
@@ -243,5 +235,3 @@ jobs:
       - name: Perform CodeQL Analysis
         if: contains(github.workspace, '*.js') || contains(github.workspace, '*.ts')
         uses: github/codeql-action/analyze@v4
-        with:
-          upload: false 
