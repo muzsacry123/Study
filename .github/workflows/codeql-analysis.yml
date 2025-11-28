@@ -51,6 +51,7 @@ jobs:
           build-command: 'echo "Python, no build needed"'
 
       - name: Perform CodeQL Analysis
+        if: contains(github.workspace, '*.py')
         uses: github/codeql-action/analyze@v4
 
   java:
@@ -93,6 +94,7 @@ jobs:
           fi
 
       - name: Perform CodeQL Analysis
+        if: contains(github.workspace, '*.java')
         uses: github/codeql-action/analyze@v4
 
   cpp:
@@ -138,6 +140,7 @@ jobs:
           fi
 
       - name: Perform CodeQL Analysis
+        if: contains(github.workspace, '*.c') || contains(github.workspace, '*.cpp')
         uses: github/codeql-action/analyze@v4
 
   csharp:
@@ -184,6 +187,7 @@ jobs:
           fi
 
       - name: Perform CodeQL Analysis
+        if: contains(github.workspace, '*.csproj') || contains(github.workspace, '*.cs')
         uses: github/codeql-action/analyze@v4
 
   javascript:
