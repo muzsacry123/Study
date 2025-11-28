@@ -38,6 +38,7 @@ jobs:
             pip install -r requirements.txt
           else
             echo "No requirements.txt, skipping install"
+          fi
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
@@ -74,6 +75,7 @@ jobs:
             mvn clean package
           else
             echo "No Java build tool detected. Skipping build"
+          fi
 
       - name: Autobuild placeholder
         uses: github/codeql-action/autobuild@v4
@@ -107,6 +109,7 @@ jobs:
             make
           else
             echo "No C/C++ build tool detected. Skipping build"
+          fi
 
       - name: Autobuild placeholder
         uses: github/codeql-action/autobuild@v4
@@ -135,6 +138,7 @@ jobs:
             dotnet build
           else
             echo "No C# project files found, skipping build"
+          fi
 
       - name: Autobuild placeholder
         uses: github/codeql-action/autobuild@v4
@@ -163,6 +167,7 @@ jobs:
             npm install
           else
             echo "No package.json found, skipping npm install"
+          fi
 
       - name: Autobuild placeholder
         uses: github/codeql-action/autobuild@v4
