@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 permissions:
-  security-events: read
+  security-events: write
 
 jobs:
   python:
@@ -77,11 +77,6 @@ jobs:
             echo "No Java build tool detected. Skipping build"
           fi
 
-      - name: Autobuild placeholder
-        uses: github/codeql-action/autobuild@v4
-        with:
-          build-command: 'echo "No extra build needed"'
-
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
 
@@ -111,11 +106,6 @@ jobs:
             echo "No C/C++ build tool detected. Skipping build"
           fi
 
-      - name: Autobuild placeholder
-        uses: github/codeql-action/autobuild@v4
-        with:
-          build-command: 'echo "No extra build needed"'
-
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
 
@@ -139,11 +129,6 @@ jobs:
           else
             echo "No C# project files found, skipping build"
           fi
-
-      - name: Autobuild placeholder
-        uses: github/codeql-action/autobuild@v4
-        with:
-          build-command: 'echo "No extra build needed"'
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
@@ -175,4 +160,5 @@ jobs:
           build-command: 'echo "No extra build needed"'
 
       - name: Perform CodeQL Analysis
+        if: contains(github.workspace, '*.js') || contains(github.workspace, '*.ts')
         uses: github/codeql-action/analyze@v4
