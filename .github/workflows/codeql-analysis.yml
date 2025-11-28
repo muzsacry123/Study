@@ -17,13 +17,61 @@ jobs:
       matrix:
         language: [ 'python', 'cpp', 'java' ]
     steps:
+      # 1️⃣ 检出代码
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2️⃣ 初始化 CodeQL
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
 
+      # 3️⃣ C/C++ 特殊处理：构建生成数据库
+      - name: Build C/C++ project
+        if: matrix.language == 'cpp'
+        run: |
+          mkdir -p build
+          cd build
+          cmake ..
+          cmake --build .
+        shell: bash
+
+      # 4️⃣ Java 项目
+      - name: Build Java/Kotlin project
+        if: matrix.language == 'java'
+        run: |
+          if [ -f "./gradlew" ]; then
+            echo "Detected Gradle project, building..."
+            chmod +x ./gradlew
+            ./gradlew build
+          elif [ -f "pom.xml" ]; then
+            echo "Detected Maven project, building..."
+            mvn clean package
+          else
+            echo "No build tool detected. Skipping build."
+          fi
+
+      # 5️⃣ Python 依赖安装
+      - name: Cache Python dependencies
+        if: matrix.language == 'python'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install Python dependencies
+        if: matrix.language == 'python'
+        run: pip install -r requirements.txt
+
+      # 6️⃣ Autobuild placeholder for languages without build step
+      - name: Autobuild placeholder
+        uses: github/codeql-action/autobuild@v4
+        with:
+          build-command: 'echo "No build needed"'
+
+      # 7️⃣ 执行 CodeQL 分析
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
