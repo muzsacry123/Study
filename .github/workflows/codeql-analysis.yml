@@ -41,31 +41,48 @@ jobs:
       - name: Get modified files
         id: files
         run: |
-          echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')" >> $GITHUB_ENV
-          echo "actual_changes=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')" >> $GITHUB_ENV
+          # 获取变化文件列表
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            git fetch origin ${{ github.event.pull_request.base.ref }}
+            changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD)
+          else
+            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          fi
+          echo "Changed files:"
+          echo "$changed_files"
+
+          # 设置环境变量
+          echo "changed_files=$changed_files" >> $GITHUB_ENV
+
+          # 设置布尔值，如果为空就表示没有修改
+          if [ -z "$changed_files" ]; then
+            echo "actual_changes=false" >> $GITHUB_ENV
+          else
+            echo "actual_changes=true" >> $GITHUB_ENV
+          fi
 
       ########################
       # Machine Learning
       ########################
       - name: Set up Python 3.9 for machine_learning
-        if: ${{ env.ml_present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.ml_present == 'true' && env.actual_changes == 'true' }}
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
       - name: Install machine_learning dependencies
-        if: ${{ env.ml_present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.ml_present == 'true' && env.actual_changes == 'true' }}
         run: |
           pip install -r python/machine_learning/requirements.txt || true
 
       - name: Initialize CodeQL for machine_learning
-        if: ${{ env.ml_present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.ml_present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/init@v4
         with:
           languages: python
 
       - name: Analyze machine_learning
-        if: ${{ env.ml_present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.ml_present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/analyze@v4
         with:
           output: results-machine_learning.sarif
@@ -74,7 +91,7 @@ jobs:
           upload: false
 
       - name: Upload machine_learning results
-        if: ${{ env.ml_present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.ml_present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results-machine_learning.sarif
@@ -83,30 +100,30 @@ jobs:
       # Manim
       ########################
       - name: Set up Python 3.10 for manim
-        if: ${{ env.manim_present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.manim_present == 'true' && env.actual_changes == 'true' }}
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
       - name: Install system dependencies for manim
-        if: ${{ env.manim_present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.manim_present == 'true' && env.actual_changes == 'true' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y pkg-config libcairo2-dev libpango1.0-dev
 
       - name: Install manim dependencies
-        if: ${{ env.manim_present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.manim_present == 'true' && env.actual_changes == 'true' }}
         run: |
           pip install -r python/manim/requirements.txt || true
 
       - name: Initialize CodeQL for manim
-        if: ${{ env.manim_present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.manim_present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/init@v4
         with:
           languages: python
 
       - name: Analyze manim
-        if: ${{ env.manim_present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.manim_present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/analyze@v4
         with:
           output: results-manim.sarif
@@ -115,7 +132,7 @@ jobs:
           upload: false
 
       - name: Upload manim results
-        if: ${{ env.manim_present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.manim_present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results-manim.sarif
@@ -142,17 +159,34 @@ jobs:
         id: files
         if: env.present == 'true'
         run: |
-          echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')" >> $GITHUB_ENV
-          echo "actual_changes=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')" >> $GITHUB_ENV
+          # 获取变化文件列表
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            git fetch origin ${{ github.event.pull_request.base.ref }}
+            changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD)
+          else
+            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          fi
+          echo "Changed files:"
+          echo "$changed_files"
+
+          # 设置环境变量
+          echo "changed_files=$changed_files" >> $GITHUB_ENV
+
+          # 设置布尔值，如果为空就表示没有修改
+          if [ -z "$changed_files" ]; then
+            echo "actual_changes=false" >> $GITHUB_ENV
+          else
+            echo "actual_changes=true" >> $GITHUB_ENV
+          fi
 
       - name: Initialize CodeQL
-        if: ${{ env.present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/init@v4
         with:
           languages: java
 
       - name: Build all Java subprojects
-        if: ${{ env.present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
         run: |
           shopt -s globstar
           found_build=false
@@ -183,14 +217,14 @@ jobs:
           fi
 
       - name: Perform CodeQL Analysis
-        if: ${{ env.present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/analyze@v4
         with:
           output: results-java.sarif
           paths: ${{ env.changed }}
           upload: false
       - name: Upload CodeQL results
-        if: ${{ env.present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results-java.sarif
@@ -215,17 +249,34 @@ jobs:
         id: files
         if: env.present == 'true'
         run: |
-          echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')" >> $GITHUB_ENV
-          echo "actual_changes=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')" >> $GITHUB_ENV
+          # 获取变化文件列表
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            git fetch origin ${{ github.event.pull_request.base.ref }}
+            changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD)
+          else
+            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          fi
+          echo "Changed files:"
+          echo "$changed_files"
+
+          # 设置环境变量
+          echo "changed_files=$changed_files" >> $GITHUB_ENV
+
+          # 设置布尔值，如果为空就表示没有修改
+          if [ -z "$changed_files" ]; then
+            echo "actual_changes=false" >> $GITHUB_ENV
+          else
+            echo "actual_changes=true" >> $GITHUB_ENV
+          fi
 
       - name: Initialize CodeQL
-        if: ${{ env.present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/init@v4
         with:
           languages: cpp
 
       - name: Build C/C++
-        if: ${{ env.present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
         run: |
           cd cpp
           if [ -f "CMakeLists.txt" ]; then
@@ -237,14 +288,14 @@ jobs:
           fi
 
       - name: Perform CodeQL Analysis
-        if: ${{ env.present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/analyze@v4
         with:
           output: results-cpp.sarif
           paths: ${{ env.changed }}
           upload: false
       - name: Upload CodeQL results
-        if: ${{ env.present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results-cpp.sarif
@@ -269,31 +320,48 @@ jobs:
         id: files
         if: env.present == 'true'
         run: |
-          echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')" >> $GITHUB_ENV
-          echo "actual_changes=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')" >> $GITHUB_ENV
+          # 获取变化文件列表
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            git fetch origin ${{ github.event.pull_request.base.ref }}
+            changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD)
+          else
+            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          fi
+          echo "Changed files:"
+          echo "$changed_files"
+
+          # 设置环境变量
+          echo "changed_files=$changed_files" >> $GITHUB_ENV
+
+          # 设置布尔值，如果为空就表示没有修改
+          if [ -z "$changed_files" ]; then
+            echo "actual_changes=false" >> $GITHUB_ENV
+          else
+            echo "actual_changes=true" >> $GITHUB_ENV
+          fi
 
       - name: Initialize CodeQL
-        if: ${{ env.present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/init@v4
         with:
           languages: csharp
 
       - name: Build C#
-        if: ${{ env.present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
         run: |
           for proj in csharp/**/*.csproj; do
             [ -f "$proj" ] && dotnet build "$proj"
           done
 
       - name: Perform CodeQL Analysis
-        if: ${{ env.present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/analyze@v4
         with:
           output: results-csharp.sarif
           paths: ${{ env.changed }}
           upload: false
       - name: Upload CodeQL results
-        if: ${{ env.present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results-csharp.sarif
@@ -318,31 +386,48 @@ jobs:
         id: files
         if: env.present == 'true'
         run: |
-          echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')" >> $GITHUB_ENV
-          echo "actual_changes=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')" >> $GITHUB_ENV
+          # 获取变化文件列表
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            git fetch origin ${{ github.event.pull_request.base.ref }}
+            changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD)
+          else
+            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          fi
+          echo "Changed files:"
+          echo "$changed_files"
 
+          # 设置环境变量
+          echo "changed_files=$changed_files" >> $GITHUB_ENV
+
+          # 设置布尔值，如果为空就表示没有修改
+          if [ -z "$changed_files" ]; then
+            echo "actual_changes=false" >> $GITHUB_ENV
+          else
+            echo "actual_changes=true" >> $GITHUB_ENV
+          fi
+          
       - name: Initialize CodeQL
-        if: ${{ env.present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/init@v4
         with:
           languages: javascript
 
       - name: npm install
-        if: ${{ env.present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
         run: |
           if [ -f "javascript/package.json" ]; then
             cd javascript && npm install
           fi
 
       - name: Perform CodeQL Analysis
-        if: ${{ env.present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/analyze@v4
         with:
           output: results-js.sarif
           paths: ${{ env.changed }}
           upload: false
       - name: Upload CodeQL results
-        if: ${{ env.present == 'true' && env.changed_files != '' && env.actual_changes != '' }}
+        if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results-js.sarif
