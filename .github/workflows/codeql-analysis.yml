@@ -27,7 +27,9 @@ jobs:
 
       - name: Skip
         if: env.present == 'false'
-        run: echo "No Python code; skipping." && exit 0
+        run: |
+          echo "No Python code; skipping."
+          exit 0
 
       - uses: github/codeql-action/init@v4
         with:
@@ -38,8 +40,9 @@ jobs:
           if [ -f "python/requirements.txt" ]; then
             pip install -r python/requirements.txt
           fi
-
-      - uses: github/codeql-action/analyze@v4
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
 
   java:
     name: Java/Kotlin CodeQL
@@ -59,7 +62,9 @@ jobs:
 
       - name: Skip
         if: env.present == 'false'
-        run: echo "No Java code; skipping." && exit 0
+        run: |
+          echo "No Java code; skipping."
+          exit 0
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
@@ -104,7 +109,9 @@ jobs:
 
       - name: Skip
         if: env.present == 'false'
-        run: echo "No C/C++ code; skipping." && exit 0
+        run: |
+          echo "No C/C++ code; skipping."
+          exit 0
 
       - uses: github/codeql-action/init@v4
         with:
@@ -140,7 +147,9 @@ jobs:
 
       - name: Skip
         if: env.present == 'false'
-        run: echo "No C# code; skipping." && exit 0
+        run: |
+          echo "No C# code; skipping."
+          exit 0
 
       - uses: github/codeql-action/init@v4
         with:
@@ -171,7 +180,9 @@ jobs:
 
       - name: Skip
         if: env.present == 'false'
-        run: echo "No JS/TS code; skipping." && exit 0
+        run: |
+          echo "No JS/TS code; skipping."
+          exit 0
 
       - uses: github/codeql-action/init@v4
         with:
