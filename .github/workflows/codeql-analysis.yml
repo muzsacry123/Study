@@ -10,91 +10,64 @@ permissions:
   security-events: write
 
 jobs:
-  Python_ML:
-    name: Python Machine Learning
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Detect Python files
-        id: check
-        run: |
-          shopt -s globstar
-          if compgen -G "python/**/*.py" > /dev/null; then
-            echo "present=true" >> $GITHUB_ENV
-          else
-            echo "present=false" >> $GITHUB_ENV
-          fi
-      - name: Setup Python 3.9
-        if: env.present == 'true'
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      - name: Initialize CodeQL
-        if: env.present == 'true'
-        uses: github/codeql-action/init@v4
-        with:
-          languages: python
-      - name: Install dependencies
-        if: env.present == 'true'
-        run: |
-          cd python/machine_learning
-          pip install -r requirements.txt
-      - name: Run CodeQL Analysis
-        if: env.present == 'true'
-        uses: github/codeql-action/analyze@v4
-        with:
-          output: results-python_machine_learning.sarif
-      - name: Upload CodeQL results
-        if: env.present == 'true'
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: results-python_machine_learning.sarif
-          category: python_machine_learning
+  python:
+  name: Python CodeQL
+  runs-on: ubuntu-latest
+  timeout-minutes: 60
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-  Python_manim:
-    name: Python Manim
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Detect Python files
-        id: check
-        run: |
-          shopt -s globstar
-          if compgen -G "python/**/*.py" > /dev/null; then
-            echo "present=true" >> $GITHUB_ENV
-          else
-            echo "present=false" >> $GITHUB_ENV
-          fi
-      - name: Setup Python 3.10
-        if: env.present == 'true'
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - name: Install system dependencies for manim
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y pkg-config libcairo2-dev libpango1.0-dev
-      - name: Initialize CodeQL
-        if: env.present == 'true'
-        uses: github/codeql-action/init@v4
-        with:
-          languages: python
-      - name: Install dependencies
-        if: env.present == 'true'
-        run: |
-          cd python/manim
-          pip install -r requirements.txt
-      - name: Run CodeQL Analysis
-        if: env.present == 'true'
-        uses: github/codeql-action/analyze@v4
-        with:
-          output: results-python_manim.sarif
-      - name: Upload CodeQL results
-        if: env.present == 'true'
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: results-python_manim.sarif
-          category: python_manim
+    ########################
+    # Machine Learning 项目
+    ########################
+    - name: Set up Python 3.9 for machine_learning
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install machine_learning dependencies
+      run: |
+        if [ -f "python/machine_learning/requirements.txt" ]; then
+          pip install -r python/machine_learning/requirements.txt
+        else
+          echo "No requirements.txt for machine_learning, skipping install"
+        fi
+
+    - name: Initialize CodeQL for Python
+      uses: github/codeql-action/init@v4
+      with:
+        languages: python
+
+    - name: CodeQL analyze machine_learning
+      uses: github/codeql-action/analyze@v4
+      with:
+        output: results-machine_learning.sarif
+        category: python_machine_learning
+        paths: python/machine_learning
+
+    ########################
+    # Manim 项目
+    ########################
+    - name: Set up Python 3.10 for manim
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install manim dependencies
+      run: |
+        if [ -f "python/manim/requirements.txt" ]; then
+          pip install -r python/manim/requirements.txt
+        else
+          echo "No requirements.txt for manim, skipping install"
+        fi
+
+    - name: CodeQL analyze manim
+      uses: github/codeql-action/analyze@v4
+      with:
+        output: results-manim.sarif
+        category: python_manim
+        paths: python/manim
 
   java:
     name: Java/Kotlin CodeQL
