@@ -26,6 +26,16 @@ jobs:
             echo "present=false" >> $GITHUB_ENV
           fi
 
+      - name: Set up Python
+        if: env.present == 'true'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install system dependencies
+        if: env.present == 'true'
+        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev libgirepository1.0-dev gir1.2-pango-1.0 python3-gi-cairo
+
       - name: Initialize CodeQL
         if: env.present == 'true'
         uses: github/codeql-action/init@v4
@@ -66,31 +76,15 @@ jobs:
         with:
           languages: java
 
-      - name: Autobuild all Java subprojects
+      - name: Build all Java subprojects
         if: env.present == 'true'
-        uses: github/codeql-action/autobuild@v4
-        with:
-          build-command: |
-            shopt -s globstar
-            for proj in java/*/app; do
-              # 检查目录下是否有 Java 文件
-              if compgen -G "$proj/**/*.java" > /dev/null; then
-                echo "Building project at $proj"
-                cd "$proj"
-                # 如果是 Gradle Kotlin DSL
-                if [ -f "build.gradle.kts" ]; then
-                  ./gradlew build || echo "Build failed for $proj, skipping"
-                # 如果是普通 Gradle
-                elif [ -f "build.gradle" ]; then
-                  ./gradlew build || echo "Build failed for $proj, skipping"
-                else
-                  echo "No recognized build file in $proj, skipping"
-                fi
-                cd - >/dev/null
-              else
-                echo "No Java files in $proj, skipping"
-              fi
-            done
+        run: |
+          shopt -s globstar
+          for proj in java/**/build.gradle.kts; do
+            dir=$(dirname "$proj")
+            echo "Building Java project in $dir"
+            (cd "$dir" && ./gradlew build)
+          done
 
       - name: Perform CodeQL Analysis
         if: env.present == 'true'
