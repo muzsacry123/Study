@@ -1,0 +1,186 @@
+name: "CodeQL Multi-language Analysis"
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+permissions:
+  security-events: write
+
+jobs:
+  python:
+    name: Python CodeQL
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect Python files
+        id: check
+        run: |
+          if compgen -G "python/**/*.py" > /dev/null; then
+            echo "present=true" >> $GITHUB_ENV
+          else
+            echo "present=false" >> $GITHUB_ENV
+          fi
+
+      - name: Skip
+        if: env.present == 'false'
+        run: echo "No Python code; skipping." && exit 0
+
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: python
+
+      - name: Install python deps
+        run: |
+          if [ -f "python/requirements.txt" ]; then
+            pip install -r python/requirements.txt
+          fi
+
+      - uses: github/codeql-action/analyze@v4
+
+  java:
+    name: Java/Kotlin CodeQL
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Detect Java files
+        id: check
+        run: |
+          if compgen -G "java/**/*.java" > /dev/null; then
+            echo "present=true" >> $GITHUB_ENV
+          else
+            echo "present=false" >> $GITHUB_ENV
+          fi
+
+      - name: Skip
+        if: env.present == 'false'
+        run: echo "No Java code; skipping." && exit 0
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: java
+
+      - name: Build all Java Gradle projects
+        run: |
+          shopt -s globstar
+          found=false
+          for gradle_file in java/**/build.gradle java/**/build.gradle.kts; do
+            if [ -f "$gradle_file" ]; then
+              echo "Found Gradle project: $gradle_file"
+              project_dir=$(dirname "$gradle_file")
+              echo "Building $project_dir"
+              (cd "$project_dir" && ./gradlew build || true)
+              found=true
+            fi
+          done
+
+          if [ "$found" = false ]; then
+            echo "No Gradle projects were found. Skipping Java build."
+          fi
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+
+  cpp:
+    name: C/C++ CodeQL
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect C/C++ files
+        id: check
+        run: |
+          if compgen -G "cpp/**/*.c" > /dev/null || compgen -G "cpp/**/*.cpp" > /dev/null; then
+            echo "present=true" >> $GITHUB_ENV
+          else
+            echo "present=false" >> $GITHUB_ENV
+          fi
+
+      - name: Skip
+        if: env.present == 'false'
+        run: echo "No C/C++ code; skipping." && exit 0
+
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: cpp
+
+      - name: Build C/C++
+        run: |
+          cd cpp
+          if [ -f "CMakeLists.txt" ]; then
+            mkdir -p build && cd build && cmake .. && cmake --build .
+          elif [ -f "Makefile" ]; then
+            make
+          else
+            echo "No C/C++ build tool."
+          fi
+
+      - uses: github/codeql-action/analyze@v4
+
+  csharp:
+    name: C# CodeQL
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect C# files
+        id: check
+        run: |
+          if compgen -G "csharp/**/*.cs" > /dev/null || compgen -G "csharp/**/*.csproj" > /dev/null; then
+            echo "present=true" >> $GITHUB_ENV
+          else
+            echo "present=false" >> $GITHUB_ENV
+          fi
+
+      - name: Skip
+        if: env.present == 'false'
+        run: echo "No C# code; skipping." && exit 0
+
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: csharp
+
+      - name: Build C#
+        run: |
+          for proj in csharp/**/*.csproj; do
+            [ -f "$proj" ] && dotnet build "$proj"
+          done
+
+      - uses: github/codeql-action/analyze@v4
+
+  javascript:
+    name: JavaScript/TypeScript CodeQL
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect JS/TS files
+        id: check
+        run: |
+          if compgen -G "javascript/**/*.js" > /dev/null || compgen -G "javascript/**/*.ts" > /dev/null; then
+            echo "present=true" >> $GITHUB_ENV
+          else
+            echo "present=false" >> $GITHUB_ENV
+          fi
+
+      - name: Skip
+        if: env.present == 'false'
+        run: echo "No JS/TS code; skipping." && exit 0
+
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: javascript
+
+      - name: npm install
+        run: |
+          if [ -f "javascript/package.json" ]; then
+            cd javascript && npm install
+          fi
+
+      - uses: github/codeql-action/analyze@v4
