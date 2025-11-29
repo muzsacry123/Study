@@ -50,5 +50,6 @@ public class App {
         int[] num2 = { 3, 6, 7, 4, 5 };
         Arrays.sort(num2);
         System.out.println("\nSorted array: " + Arrays.toString(num2));
+        
     }
 }
