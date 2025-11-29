@@ -18,94 +18,102 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      - name: Detect Python files
-        id: check
+      - name: Detect machine_learning Python files
+        id: check_ml
         run: |
           shopt -s globstar
-          if compgen -G "python/**/*.py" > /dev/null; then
-            echo "present=true" >> $GITHUB_ENV
+          if compgen -G "python/machine_learning/**/*.py" > /dev/null; then
+            echo "ml_present=true" >> $GITHUB_ENV
           else
-            echo "present=false" >> $GITHUB_ENV
+            echo "ml_present=false" >> $GITHUB_ENV
+          fi
+
+      - name: Detect manim Python files
+        id: check_manim
+        run: |
+          shopt -s globstar
+          if compgen -G "python/manim/**/*.py" > /dev/null; then
+            echo "manim_present=true" >> $GITHUB_ENV
+          else
+            echo "manim_present=false" >> $GITHUB_ENV
           fi
 
       ########################
-      # Machine Learning 项目
+      # Machine Learning
       ########################
       - name: Set up Python 3.9 for machine_learning
-        if: env.present == 'true'
+        if: env.ml_present == 'true'
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
       - name: Install machine_learning dependencies
-        if: env.present == 'true'
+        if: env.ml_present == 'true'
         run: |
-          if [ -f "python/machine_learning/requirements.txt" ]; then
-            pip install -r python/machine_learning/requirements.txt
-          else
-            echo "No requirements.txt for machine_learning, skipping install"
-          fi
+          pip install -r python/machine_learning/requirements.txt || true
 
-      - name: Initialize CodeQL for Python
-        if: env.present == 'true'
+      - name: Initialize CodeQL for machine_learning
+        if: env.ml_present == 'true'
         uses: github/codeql-action/init@v4
         with:
           languages: python
 
-      - name: CodeQL analyze machine_learning
-        if: env.present == 'true'
+      - name: Analyze machine_learning
+        if: env.ml_present == 'true'
         uses: github/codeql-action/analyze@v4
         with:
           output: results-machine_learning.sarif
           category: python_machine_learning
           paths: python/machine_learning
           upload: false
-      - name: Upload CodeQL results manim
-        if: env.present == 'true'
+
+      - name: Upload machine_learning results
+        if: env.ml_present == 'true'
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results-machine_learning.sarif
 
-
       ########################
-      # Manim 项目
+      # Manim
       ########################
       - name: Set up Python 3.10 for manim
+        if: env.manim_present == 'true'
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      
+
       - name: Install system dependencies for manim
+        if: env.manim_present == 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y pkg-config libcairo2-dev libpango1.0-dev
 
       - name: Install manim dependencies
+        if: env.manim_present == 'true'
         run: |
-          if [ -f "python/manim/requirements.txt" ]; then
-            pip install -r python/manim/requirements.txt
-          else
-            echo "No requirements.txt for manim, skipping install"
-          fi
+          pip install -r python/manim/requirements.txt || true
 
-      - name: Initialize CodeQL for Python
-        if: env.present == 'true'
+      - name: Initialize CodeQL for manim
+        if: env.manim_present == 'true'
         uses: github/codeql-action/init@v4
         with:
           languages: python
 
-      - name: CodeQL analyze manim
+      - name: Analyze manim
+        if: env.manim_present == 'true'
         uses: github/codeql-action/analyze@v4
         with:
           output: results-manim.sarif
           category: python_manim
           paths: python/manim
           upload: false
-      - name: Upload CodeQL results manim
-        if: env.present == 'true'
+
+      - name: Upload manim results
+        if: env.manim_present == 'true'
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results-manim.sarif
+
 
   java:
     name: Java/Kotlin CodeQL
