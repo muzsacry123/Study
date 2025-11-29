@@ -25,23 +25,19 @@ jobs:
             echo "present=false" >> $GITHUB_ENV
           fi
 
-      - name: Skip
-        if: env.present == 'false'
-        run: |
-          echo "No Python code; skipping."
-          exit 0
-
       - uses: github/codeql-action/init@v4
         with:
           languages: python
 
       - name: Install python deps
+        if: env.present == 'true'
         run: |
           if [ -f "python/requirements.txt" ]; then
             pip install -r python/requirements.txt
           fi
       
       - name: Perform CodeQL Analysis
+        if: env.present == 'true'
         uses: github/codeql-action/analyze@v4
 
   java:
@@ -60,18 +56,14 @@ jobs:
             echo "present=false" >> $GITHUB_ENV
           fi
 
-      - name: Skip
-        if: env.present == 'false'
-        run: |
-          echo "No Java code; skipping."
-          exit 0
-
       - name: Initialize CodeQL
+        if: env.present == 'true'
         uses: github/codeql-action/init@v4
         with:
           languages: java
 
       - name: Build all Java Gradle projects
+        if: env.present == 'true'
         run: |
           shopt -s globstar
           found=false
@@ -90,6 +82,7 @@ jobs:
           fi
 
       - name: Perform CodeQL Analysis
+        if: env.present == 'true'
         uses: github/codeql-action/analyze@v4
 
   cpp:
@@ -107,17 +100,12 @@ jobs:
             echo "present=false" >> $GITHUB_ENV
           fi
 
-      - name: Skip
-        if: env.present == 'false'
-        run: |
-          echo "No C/C++ code; skipping."
-          exit 0
-
       - uses: github/codeql-action/init@v4
         with:
           languages: cpp
 
       - name: Build C/C++
+        if: env.present == 'true'
         run: |
           cd cpp
           if [ -f "CMakeLists.txt" ]; then
@@ -128,7 +116,9 @@ jobs:
             echo "No C/C++ build tool."
           fi
 
-      - uses: github/codeql-action/analyze@v4
+      - name: Perform CodeQL Analysis
+        if: env.present == 'true'
+        uses: github/codeql-action/analyze@v4
 
   csharp:
     name: C# CodeQL
@@ -145,23 +135,20 @@ jobs:
             echo "present=false" >> $GITHUB_ENV
           fi
 
-      - name: Skip
-        if: env.present == 'false'
-        run: |
-          echo "No C# code; skipping."
-          exit 0
-
       - uses: github/codeql-action/init@v4
         with:
           languages: csharp
 
       - name: Build C#
+        if: env.present == 'true'
         run: |
           for proj in csharp/**/*.csproj; do
             [ -f "$proj" ] && dotnet build "$proj"
           done
 
-      - uses: github/codeql-action/analyze@v4
+      - name: Perform CodeQL Analysis
+        if: env.present == 'true'
+        uses: github/codeql-action/analyze@v4
 
   javascript:
     name: JavaScript/TypeScript CodeQL
@@ -178,20 +165,17 @@ jobs:
             echo "present=false" >> $GITHUB_ENV
           fi
 
-      - name: Skip
-        if: env.present == 'false'
-        run: |
-          echo "No JS/TS code; skipping."
-          exit 0
-
       - uses: github/codeql-action/init@v4
         with:
           languages: javascript
 
       - name: npm install
+        if: env.present == 'true'
         run: |
           if [ -f "javascript/package.json" ]; then
             cd javascript && npm install
           fi
 
-      - uses: github/codeql-action/analyze@v4
+      - name: Perform CodeQL Analysis
+        if: env.present == 'true'
+        uses: github/codeql-action/analyze@v4
