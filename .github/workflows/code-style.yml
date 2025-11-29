@@ -1,0 +1,71 @@
+name: Code Style Check
+
+on:
+  pull_request:
+
+jobs:
+  code-style:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git fetch origin ${{ github.event.pull_request.base.ref }}
+            changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD | tr '\n' ' ')
+          else
+            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')
+          fi
+          echo "changed_files=$changed_files" >> $GITHUB_ENV
+          echo "Changed files:"
+          echo "$changed_files"
+
+      ########## Python Lint ##########
+      - name: Run flake8
+        if: contains(env.changed_files, '.py')
+        run: |
+          pip install flake8
+          cd python
+          flake8 .
+
+      ########## C# Lint ##########
+      - name: Run dotnet format
+        if: contains(env.changed_files, '.cs') || contains(env.changed_files, '.csproj')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dotnet-sdk-7.0
+          dotnet tool install -g dotnet-format
+          export PATH="$PATH:/home/runner/.dotnet/tools"
+          cd csharp
+          dotnet format --verify-no-changes
+
+      ########## Java Lint ##########
+      - name: Run Checkstyle
+        if: contains(env.changed_files, '.java')
+        run: |
+          wget -q https://github.com/checkstyle/checkstyle/releases/download/checkstyle-10.13.0/checkstyle-10.13.0-all.jar -O checkstyle.jar
+          wget -q https://raw.githubusercontent.com/checkstyle/checkstyle/checkstyle-10.13.0/src/main/resources/google_checks.xml -O google_checks.xml
+          java -jar checkstyle.jar -c google_checks.xml java/
+
+      ########## JS / TS Lint ##########
+      - name: Run ESLint
+        if: contains(env.changed_files, '.js') || contains(env.changed_files, '.ts')
+        run: |
+          npm install
+          cd javascript
+          npx eslint .
+
+      ########## clang-format ##########
+      - name: Run clang-format
+        if: contains(env.changed_files, '.js') || contains(env.changed_files, '.ts')
+        run: |
+          sudo apt-get install -y clang-format
+          for f in $(find cpp -name "*.c" -o -name "*.cpp" -o -name "*.hpp" -o -name "*.h"); do
+            clang-format --dry-run --Werror "$f"
+          done
+      

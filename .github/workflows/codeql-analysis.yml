@@ -46,9 +46,9 @@ jobs:
           # 获取变化文件列表
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             git fetch origin ${{ github.event.pull_request.base.ref }}
-            changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD)
+            changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD | tr '\n' ' ')
           else
-            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')
           fi
           echo "Changed files:"
           echo "$changed_files"
@@ -93,7 +93,7 @@ jobs:
         with:
           output: results-machine_learning.sarif
           category: python_machine_learning
-          paths: ${{ env.changed }}
+          paths: ${{ env.changed_files }}
           upload: false
 
       - name: Upload machine_learning results
@@ -134,7 +134,7 @@ jobs:
         with:
           output: results-manim.sarif
           category: python_manim
-          paths: ${{ env.changed }}
+          paths: ${{ env.changed_files }}
           upload: false
 
       - name: Upload manim results
@@ -170,9 +170,9 @@ jobs:
           # 获取变化文件列表
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             git fetch origin ${{ github.event.pull_request.base.ref }}
-            changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD)
+            changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD | tr '\n' ' ')
           else
-            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')
           fi
           echo "Changed files:"
           echo "$changed_files"
@@ -233,7 +233,7 @@ jobs:
         uses: github/codeql-action/analyze@v4
         with:
           output: results-java.sarif
-          paths: ${{ env.changed }}
+          paths: ${{ env.changed_files }}
           upload: false
       - name: Upload CodeQL results
         if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
@@ -266,9 +266,9 @@ jobs:
           # 获取变化文件列表
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             git fetch origin ${{ github.event.pull_request.base.ref }}
-            changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD)
+            changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD | tr '\n' ' ')
           else
-            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')
           fi
           echo "Changed files:"
           echo "$changed_files"
@@ -310,7 +310,7 @@ jobs:
         uses: github/codeql-action/analyze@v4
         with:
           output: results-cpp.sarif
-          paths: ${{ env.changed }}
+          paths: ${{ env.changed_files }}
           upload: false
       - name: Upload CodeQL results
         if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
@@ -343,9 +343,9 @@ jobs:
           # 获取变化文件列表
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             git fetch origin ${{ github.event.pull_request.base.ref }}
-            changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD)
+            changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD | tr '\n' ' ')
           else
-            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')
           fi
           echo "Changed files:"
           echo "$changed_files"
@@ -382,7 +382,7 @@ jobs:
         uses: github/codeql-action/analyze@v4
         with:
           output: results-csharp.sarif
-          paths: ${{ env.changed }}
+          paths: ${{ env.changed_files }}
           upload: false
       - name: Upload CodeQL results
         if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
@@ -415,9 +415,9 @@ jobs:
           # 获取变化文件列表
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             git fetch origin ${{ github.event.pull_request.base.ref }}
-            changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD)
+            changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD | tr '\n' ' ')
           else
-            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+            changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')
           fi
           echo "Changed files:"
           echo "$changed_files"
@@ -454,7 +454,7 @@ jobs:
         uses: github/codeql-action/analyze@v4
         with:
           output: results-js.sarif
-          paths: ${{ env.changed }}
+          paths: ${{ env.changed_files }}
           upload: false
       - name: Upload CodeQL results
         if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
