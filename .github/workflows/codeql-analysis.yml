@@ -29,6 +29,11 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+      - name: Initialize CodeQL
+        if: env.present == 'true'
+        uses: github/codeql-action/init@v4
+        with:
+          languages: python
       - name: Install dependencies
         if: env.present == 'true'
         run: |
@@ -59,6 +64,15 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+      - name: Install system dependencies for manim
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libcairo2-dev libpango1.0-dev
+      - name: Initialize CodeQL
+        if: env.present == 'true'
+        uses: github/codeql-action/init@v4
+        with:
+          languages: python
       - name: Install dependencies
         if: env.present == 'true'
         run: |
