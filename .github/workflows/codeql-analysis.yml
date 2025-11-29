@@ -17,16 +17,28 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      
+      - name: Detect Python files
+        id: check
+        run: |
+          shopt -s globstar
+          if compgen -G "python/**/*.py" > /dev/null; then
+            echo "present=true" >> $GITHUB_ENV
+          else
+            echo "present=false" >> $GITHUB_ENV
+          fi
 
       ########################
       # Machine Learning 项目
       ########################
       - name: Set up Python 3.9 for machine_learning
+        if: env.present == 'true'
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
       - name: Install machine_learning dependencies
+        if: env.present == 'true'
         run: |
           if [ -f "python/machine_learning/requirements.txt" ]; then
             pip install -r python/machine_learning/requirements.txt
@@ -35,16 +47,25 @@ jobs:
           fi
 
       - name: Initialize CodeQL for Python
+        if: env.present == 'true'
         uses: github/codeql-action/init@v4
         with:
           languages: python
 
       - name: CodeQL analyze machine_learning
+        if: env.present == 'true'
         uses: github/codeql-action/analyze@v4
         with:
           output: results-machine_learning.sarif
           category: python_machine_learning
           paths: python/machine_learning
+          upload: false
+      - name: Upload CodeQL results manim
+        if: env.present == 'true'
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: results-machine_learning.sarif
+
 
       ########################
       # Manim 项目
@@ -53,6 +74,11 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+      
+      - name: Install system dependencies for manim
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libcairo2-dev libpango1.0-dev
 
       - name: Install manim dependencies
         run: |
@@ -68,6 +94,12 @@ jobs:
           output: results-manim.sarif
           category: python_manim
           paths: python/manim
+          upload: false
+      - name: Upload CodeQL results manim
+        if: env.present == 'true'
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: results-manim.sarif
 
   java:
     name: Java/Kotlin CodeQL
