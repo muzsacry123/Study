@@ -19,6 +19,7 @@ jobs:
       - name: Detect Python files
         id: check
         run: |
+          shopt -s globstar
           if compgen -G "python/**/*.py" > /dev/null; then
             echo "present=true" >> $GITHUB_ENV
           else
@@ -52,6 +53,7 @@ jobs:
       - name: Detect Java files
         id: check
         run: |
+          shopt -s globstar
           if compgen -G "java/**/*.java" > /dev/null; then
             echo "present=true" >> $GITHUB_ENV
           else
@@ -96,6 +98,7 @@ jobs:
       - name: Detect C/C++ files
         id: check
         run: |
+          shopt -s globstar
           if compgen -G "cpp/**/*.c" > /dev/null || compgen -G "cpp/**/*.cpp" > /dev/null; then
             echo "present=true" >> $GITHUB_ENV
           else
@@ -133,6 +136,7 @@ jobs:
       - name: Detect C# files
         id: check
         run: |
+          shopt -s globstar
           if compgen -G "csharp/**/*.cs" > /dev/null || compgen -G "csharp/**/*.csproj" > /dev/null; then
             echo "present=true" >> $GITHUB_ENV
           else
@@ -165,6 +169,7 @@ jobs:
       - name: Detect JS/TS files
         id: check
         run: |
+          shopt -s globstar
           if compgen -G "javascript/**/*.js" > /dev/null || compgen -G "javascript/**/*.ts" > /dev/null; then
             echo "present=true" >> $GITHUB_ENV
           else
