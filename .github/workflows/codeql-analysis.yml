@@ -57,11 +57,15 @@ jobs:
           echo "changed_files=$changed_files" >> $GITHUB_ENV
 
           # 设置布尔值，如果为空就表示没有修改
-          if [ -z "$changed_files" ]; then
-            echo "actual_changes=false" >> $GITHUB_ENV
-          else
-            echo "actual_changes=true" >> $GITHUB_ENV
-          fi
+          echo "actual_changes=false" >> $GITHUB_ENV
+          for file in $changed_files; do
+            case "$file" in
+              *.py)
+                echo "actual_changes=true" >> $GITHUB_ENV
+                break  # 找到一个就可以退出循环
+                ;;
+            esac
+          done
 
       ########################
       # Machine Learning
@@ -177,11 +181,15 @@ jobs:
           echo "changed_files=$changed_files" >> $GITHUB_ENV
 
           # 设置布尔值，如果为空就表示没有修改
-          if [ -z "$changed_files" ]; then
-            echo "actual_changes=false" >> $GITHUB_ENV
-          else
-            echo "actual_changes=true" >> $GITHUB_ENV
-          fi
+          echo "actual_changes=false" >> $GITHUB_ENV
+          for file in $changed_files; do
+            case "$file" in
+              *.java)
+                echo "actual_changes=true" >> $GITHUB_ENV
+                break  # 找到一个就可以退出循环
+                ;;
+            esac
+          done
 
       - name: Initialize CodeQL
         if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
@@ -269,11 +277,15 @@ jobs:
           echo "changed_files=$changed_files" >> $GITHUB_ENV
 
           # 设置布尔值，如果为空就表示没有修改
-          if [ -z "$changed_files" ]; then
-            echo "actual_changes=false" >> $GITHUB_ENV
-          else
-            echo "actual_changes=true" >> $GITHUB_ENV
-          fi
+          echo "actual_changes=false" >> $GITHUB_ENV
+          for file in $changed_files; do
+            case "$file" in
+              *.c|*.cpp|*.h|*.hpp)
+                echo "actual_changes=true" >> $GITHUB_ENV
+                break  # 找到一个就可以退出循环
+                ;;
+            esac
+          done
 
       - name: Initialize CodeQL
         if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
@@ -342,11 +354,15 @@ jobs:
           echo "changed_files=$changed_files" >> $GITHUB_ENV
 
           # 设置布尔值，如果为空就表示没有修改
-          if [ -z "$changed_files" ]; then
-            echo "actual_changes=false" >> $GITHUB_ENV
-          else
-            echo "actual_changes=true" >> $GITHUB_ENV
-          fi
+          echo "actual_changes=false" >> $GITHUB_ENV
+          for file in $changed_files; do
+            case "$file" in
+              *.cs|*.csproj)
+                echo "actual_changes=true" >> $GITHUB_ENV
+                break  # 找到一个就可以退出循环
+                ;;
+            esac
+          done
 
       - name: Initialize CodeQL
         if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
@@ -410,11 +426,15 @@ jobs:
           echo "changed_files=$changed_files" >> $GITHUB_ENV
 
           # 设置布尔值，如果为空就表示没有修改
-          if [ -z "$changed_files" ]; then
-            echo "actual_changes=false" >> $GITHUB_ENV
-          else
-            echo "actual_changes=true" >> $GITHUB_ENV
-          fi
+          echo "actual_changes=false" >> $GITHUB_ENV
+          for file in $changed_files; do
+            case "$file" in
+              *.js|*.ts)
+                echo "actual_changes=true" >> $GITHUB_ENV
+                break  # 找到一个就可以退出循环
+                ;;
+            esac
+          done
           
       - name: Initialize CodeQL
         if: ${{ env.present == 'true' && env.actual_changes == 'true' }}
