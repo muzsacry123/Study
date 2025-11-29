@@ -44,7 +44,6 @@ jobs:
         uses: github/codeql-action/analyze@v4
         with:
           output: results-python_machine_learning.sarif
-          category: python_machine_learning
       - name: Upload CodeQL results
         if: env.present == 'true'
         uses: github/codeql-action/upload-sarif@v4
@@ -90,7 +89,6 @@ jobs:
         uses: github/codeql-action/analyze@v4
         with:
           output: results-python_manim.sarif
-          category: python_manim
       - name: Upload CodeQL results
         if: env.present == 'true'
         uses: github/codeql-action/upload-sarif@v4
