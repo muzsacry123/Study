@@ -11,63 +11,63 @@ permissions:
 
 jobs:
   python:
-  name: Python CodeQL
-  runs-on: ubuntu-latest
-  timeout-minutes: 60
-  steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+    name: Python CodeQL
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    ########################
-    # Machine Learning 项目
-    ########################
-    - name: Set up Python 3.9 for machine_learning
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
+      ########################
+      # Machine Learning 项目
+      ########################
+      - name: Set up Python 3.9 for machine_learning
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
 
-    - name: Install machine_learning dependencies
-      run: |
-        if [ -f "python/machine_learning/requirements.txt" ]; then
-          pip install -r python/machine_learning/requirements.txt
-        else
-          echo "No requirements.txt for machine_learning, skipping install"
-        fi
+      - name: Install machine_learning dependencies
+        run: |
+          if [ -f "python/machine_learning/requirements.txt" ]; then
+            pip install -r python/machine_learning/requirements.txt
+          else
+            echo "No requirements.txt for machine_learning, skipping install"
+          fi
 
-    - name: Initialize CodeQL for Python
-      uses: github/codeql-action/init@v4
-      with:
-        languages: python
+      - name: Initialize CodeQL for Python
+        uses: github/codeql-action/init@v4
+        with:
+          languages: python
 
-    - name: CodeQL analyze machine_learning
-      uses: github/codeql-action/analyze@v4
-      with:
-        output: results-machine_learning.sarif
-        category: python_machine_learning
-        paths: python/machine_learning
+      - name: CodeQL analyze machine_learning
+        uses: github/codeql-action/analyze@v4
+        with:
+          output: results-machine_learning.sarif
+          category: python_machine_learning
+          paths: python/machine_learning
 
-    ########################
-    # Manim 项目
-    ########################
-    - name: Set up Python 3.10 for manim
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
+      ########################
+      # Manim 项目
+      ########################
+      - name: Set up Python 3.10 for manim
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
-    - name: Install manim dependencies
-      run: |
-        if [ -f "python/manim/requirements.txt" ]; then
-          pip install -r python/manim/requirements.txt
-        else
-          echo "No requirements.txt for manim, skipping install"
-        fi
+      - name: Install manim dependencies
+        run: |
+          if [ -f "python/manim/requirements.txt" ]; then
+            pip install -r python/manim/requirements.txt
+          else
+            echo "No requirements.txt for manim, skipping install"
+          fi
 
-    - name: CodeQL analyze manim
-      uses: github/codeql-action/analyze@v4
-      with:
-        output: results-manim.sarif
-        category: python_manim
-        paths: python/manim
+      - name: CodeQL analyze manim
+        uses: github/codeql-action/analyze@v4
+        with:
+          output: results-manim.sarif
+          category: python_manim
+          paths: python/manim
 
   java:
     name: Java/Kotlin CodeQL
@@ -262,4 +262,3 @@ jobs:
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results-js.sarif
-        
