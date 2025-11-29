@@ -1,4 +1,4 @@
-package app.src.main.java.java;
+package test1.app.src.main.java.test1;
 
 import java.util.Arrays;
 import java.util.Date;

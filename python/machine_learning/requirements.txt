@@ -1,0 +1,4 @@
+numpy==1.24.4          # 最新兼容 Python 3.9
+pandas==2.0.3          # 最新兼容 Python 3.9
+scikit-learn==1.2.2    # 最新兼容 Python 3.9
+matplotlib==3.7.1      # Python 3.9 可用版本

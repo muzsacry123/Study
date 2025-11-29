@@ -34,10 +34,12 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "java.App"
+    mainClass = "test1.App"
 }
 
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+    // 如果没有发现测试方法，也不要报错
+    failOnNoDiscoveredTests = false
 }
