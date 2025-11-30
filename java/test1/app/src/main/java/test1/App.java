@@ -1,4 +1,4 @@
-package test1.app.src.main.java.test1;
+package test1;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -50,6 +50,12 @@ public class App {
         int[] num2 = { 3, 6, 7, 4, 5 };
         Arrays.sort(num2);
         System.out.println("\nSorted array: " + Arrays.toString(num2));
+
+        int[][] num3 = new int[2][3];
+            num3[0][0] = 4;
+        System.out.println("\n2D array: " + Arrays.deepToString(num3));
         
+        // 常数
+        final float pi = 3.14F;
     }
 }
