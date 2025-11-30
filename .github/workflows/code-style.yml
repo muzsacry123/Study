@@ -1,7 +1,10 @@
 name: Code Style Check
 
 on:
+  push:
+    branches: [ master ]
   pull_request:
+    branches: [ master ]
 
 jobs:
   code-style:
